@@ -52,25 +52,48 @@ public class KnightBoard {
   }
 
   private boolean solveH(int startingR, int startingC, int level) {
-    if (level == board.length*board[0].length) return true;
+    if (level == board.length*board[0].length+1) return true;
+    //if the level has reached the size of the board, return ture
     if (startingR < 0 || startingR > board.length-1) return false;
+    //if the starting row is out of range return false;
     if (startingC < 0 || startingC > board[0].length-1) return false;
+    //if the starting col is out of range return false;
     if (board[startingR][startingC] != 0) return false;
+    //if the current space is not empty return false; 
     board[startingR][startingC]=level;
-    return solveH(startingR+2, startingC+1,level+1) ||
-           solveH(startingR+2, startingC-1,level+1) ||
-           solveH(startingR-2, startingC+1,level+1) ||
-           solveH(startingR-2, startingC-1,level+1) ||
-           solveH(startingR+1, startingC+2,level+1) ||
-           solveH(startingR+1, startingC-2,level+1) ||
-           solveH(startingR-1, startingC+2,level+1) ||
-           solveH(startingR-1, startingC-2,level+1);
+    int[] increment1 = {2,-2,1,-1};
+    int[] increment2 = {1,-1,2,-2};
+    for (int i = 0; i < 4; i ++) {
+      int newR = startingR+increment1[i];
+      int newC = startingC+increment2[i];
+      if (solveH(newR, newC, level+1)) return true;
+      // else if (newR > -1 && newC > -1 && newR < board.length && newC < board[0].length) {
+      //   board[newR][newC] = 0;
+      // }
+    }
+    for (int i = 0; i < 4; i ++) {
+      int newR = startingR+increment2[i];
+      int newC = startingC+increment1[i];
+      if (solveH(newR, newC, level+1)) return true;
+      // else if (newR > -1 && newC > -1 && newR < board.length && newC < board[0].length) {
+      //   board[newR][newC] = 0;
+      // }
+    }
+    return false;
+    // return solveH(startingR+2, startingC+1,level+1) ||
+    //        solveH(startingR+2, startingC-1,level+1) ||
+    //        solveH(startingR-2, startingC+1,level+1) ||
+    //        solveH(startingR-2, startingC-1,level+1) ||
+    //        solveH(startingR+1, startingC+2,level+1) ||
+    //        solveH(startingR+1, startingC-2,level+1) ||
+    //        solveH(startingR-1, startingC+2,level+1) ||
+    //        solveH(startingR-1, startingC-2,level+1);
   }
 
   public static void main(String[] args) {
     KnightBoard test = new KnightBoard(4,4);
     System.out.println(test);
-    KnightBoard test2 = new KnightBoard(4,6);
+    KnightBoard test2 = new KnightBoard(5,6);
     System.out.println(test2);
     System.out.println(test2.solve(0,0));
     System.out.println(test2);
