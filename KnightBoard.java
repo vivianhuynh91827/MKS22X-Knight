@@ -39,12 +39,12 @@ public class KnightBoard {
 
   public boolean solve(int startingRow, int startingCol) {
     if (startingRow < 0 || startingCol < 0) {
-      throw new IllegalArgumentException("startingRow and startingCol cannot be negative");
+      throw new IllegalArgumentException();
     }
     for (int r = 0; r < board.length; r++) {
       for (int c = 0; c < board[0].length; c++) {
         if (board[r][c] != 0) {
-          throw new IllegalStateException("Board must be empty in order to solve");
+          throw new IllegalStateException();
         }
       }
     }
@@ -59,25 +59,17 @@ public class KnightBoard {
     if (startingC < 0 || startingC > board[0].length-1) return false;
     //if the starting col is out of range return false;
     if (board[startingR][startingC] != 0) return false;
-    //if the current space is not empty return false; 
-    board[startingR][startingC]=level;
-    int[] increment1 = {2,-2,1,-1};
-    int[] increment2 = {1,-1,2,-2};
-    for (int i = 0; i < 4; i ++) {
-      int newR = startingR+increment1[i];
-      int newC = startingC+increment2[i];
+    //if the current space is not empty return false;
+    // board[startingR][startingC]=level;
+    int[][] increments = {{1,1,-1,-1,2,2,-2,-2}, {2,-2,2,-2,1,-1,1,-1}};
+    for (int i = 0; i < 8; i++) {
+      int newR = startingR + increments[0][i];
+      int newC = startingC + increments[1][i];
+      board[startingR][startingC] = level;
       if (solveH(newR, newC, level+1)) return true;
       // else if (newR > -1 && newC > -1 && newR < board.length && newC < board[0].length) {
-      //   board[newR][newC] = 0;
-      // }
-    }
-    for (int i = 0; i < 4; i ++) {
-      int newR = startingR+increment2[i];
-      int newC = startingC+increment1[i];
-      if (solveH(newR, newC, level+1)) return true;
-      // else if (newR > -1 && newC > -1 && newR < board.length && newC < board[0].length) {
-      //   board[newR][newC] = 0;
-      // }
+      //   board[newR][newC] = 0;}
+      board[startingR][startingC] = 0;
     }
     return false;
     // return solveH(startingR+2, startingC+1,level+1) ||
@@ -91,10 +83,10 @@ public class KnightBoard {
   }
 
   public static void main(String[] args) {
-    KnightBoard test = new KnightBoard(4,4);
-    System.out.println(test);
-    KnightBoard test2 = new KnightBoard(5,6);
-    System.out.println(test2);
+    // KnightBoard test = new KnightBoard(4,4);
+    // System.out.println(test);
+    KnightBoard test2 = new KnightBoard(3,7);
+    // System.out.println(test2);
     System.out.println(test2.solve(0,0));
     System.out.println(test2);
   }
