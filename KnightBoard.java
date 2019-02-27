@@ -1,14 +1,53 @@
 public class KnightBoard {
   private int[][] board;
+  private int[][] moves;
 
   public KnightBoard (int startingRows, int startingCols) {
     if (startingRows <= 0 || startingCols <= 0) {
-      throw new IllegalArgumentException("Dimensions cannot be negative");
+      throw new IllegalArgumentException();
     }
     board = new int[startingRows][startingCols];
+    moves = new int[startingRows][startingCols];
     for (int r = 0; r < startingRows; r++) {
       for (int c = 0; c < startingCols; c++) {
         board[r][c]=0;
+      }
+    }
+    fillMoves();
+  }
+
+  private void fillMoves() {
+    moves[0][0] = 2; //fill corners with 2
+    moves[0][moves[0].length-1] = 2;
+    moves[moves.length-1][0] = 2;
+    moves[moves.length-1][moves[0].length-1] = 2;
+    moves[0][1] = 3; //fill corners with 3
+    moves[1][0] = 3;
+    moves[0][moves[0].length-2] = 3;
+    moves[1][moves[0].length-1] = 3;
+    moves[moves.length-1][1] = 3;
+    moves[moves.length-2][0] = 3;
+    moves[moves.length-1][moves[0].length-2] = 3;
+    moves[moves.length-2][moves[0].length-1] = 3;
+    for (int i = 0; i < moves.length; i ++) { //fill rows outer rows with 4 and 6
+      if (moves[i][0] == 0) moves[i][0] = 4;
+      if (moves[i][1] == 0) moves[i][1] = 6;
+      if (moves[i][board[0].length - 1] == 0) moves[i][board[0].length-1] = 4;
+      if (moves[i][board[0].length - 2] == 0) moves[i][board[0].length-2] = 6;
+    }
+    for (int i = 0; i < moves[0].length; i ++) {
+      if (moves[0][i] == 0) moves[0][i] = 4;
+      if (moves[board.length - 1][i] == 0) moves[board[0].length - 1][i] = 4;
+      if (moves[1][i] == 0) moves[1][i] = 6;
+      if (moves[board.length - 2][i] == 0) moves[board[0].length - 2][i] = 6;
+    }
+    moves[1][1] = 4;
+    moves[1][board[0].length-2] = 4;
+    moves[board.length-2][1] = 4;
+    moves[board.length-2][board[0].length-2] = 4;
+    for (int r = 0; r < board.length; r++) { //fill rest of board with 8
+      for (int c = 0; c < board[0].length; c++) {
+        if (moves[r][c] == 0) moves[r][c] = 8;
       }
     }
   }
@@ -35,6 +74,17 @@ public class KnightBoard {
       boardString += "\n";
     }
     return boardString.substring(0,boardString.length()-1);
+  }
+
+  private String toStringMoves() {
+    String boardString = "";
+    for (int r = 0; r < moves.length; r ++) {
+      for (int c = 0; c < moves[0].length; c++) {
+        boardString += moves[r][c]+" ";
+      }
+      boardString += "\n";
+    }
+    return boardString;
   }
 
   public boolean solve(int startingRow, int startingCol) {
@@ -119,9 +169,9 @@ public class KnightBoard {
   public static void main(String[] args) {
     // KnightBoard test = new KnightBoard(4,4);
     // System.out.println(test);
-     KnightBoard test2 = new KnightBoard(3,3);
-     System.out.println(test2);
-     System.out.println(test2.countSolutions(0,0));
+     KnightBoard test2 = new KnightBoard(10,10);
+     // System.out.println(test2);
+     // System.out.println(test2.countSolutions(0,0));
     // System.out.println(test2.solve(0,0));
     // System.out.println(test2);
 
