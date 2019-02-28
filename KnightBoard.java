@@ -1,6 +1,9 @@
+import java.util.*;
+
 public class KnightBoard {
   private int[][] board;
   private int[][] moves;
+  int[][] increments = {{1,1,-1,-1,2,2,-2,-2}, {2,-2,2,-2,1,-1,1,-1}};
 
   public KnightBoard (int startingRows, int startingCols) {
     if (startingRows <= 0 || startingCols <= 0) {
@@ -14,6 +17,7 @@ public class KnightBoard {
       }
     }
     fillMoves();
+    System.out.println(toStringMoves());
   }
 
   private void fillMoves() {
@@ -110,7 +114,6 @@ public class KnightBoard {
     //if the starting col is out of range return false;
     if (board[startingR][startingC] != 0) return false;
     //if the current space is not empty return false;
-    int[][] increments = {{1,1,-1,-1,2,2,-2,-2}, {2,-2,2,-2,1,-1,1,-1}};
     for (int i = 0; i < 8; i++) {
       int newR = startingR + increments[0][i];
       int newC = startingC + increments[1][i];
@@ -118,6 +121,50 @@ public class KnightBoard {
       if (solveH(newR, newC, level+1)) return true;
       board[startingR][startingC] = 0;
     }
+    return false;
+  }
+
+  private int[][] getMoves(int row, int col) {
+    int[][] allMoves = new int[moves[row][col]][3]; //1st col = outgoing moves, 2nd col =  row, 3rd col = col
+    for (int i = 0; i < moves[row][col]; i ++) {
+      allMoves[i][1] = row+increments[0][i];
+      allMoves[i][2] = col+increments[1][i];
+      allMoves[i][0] = moves[allMoves[i][1]][allMoves[i][2]];
+    }
+    for (int i = 0; i < allMoves.length; i++) {
+      System.out.print(allMoves[i][0] + " ");
+      System.out.print(allMoves[i][1] + " ");
+      System.out.print(allMoves[i][2] + "\n");
+    }
+    for (int i = 1; i < allMoves.length; i ++) {
+      int cur = allMoves[i][0];
+      int curR = allMoves[i][1];
+      int curC = allMoves[i][2];
+      for (int x = i-1; x >=0; x --) {
+        if (cur < allMoves[x][0]) {
+          allMoves[x+1][0]=allMoves[x][0];
+          allMoves[x+1][1]=allMoves[x][1];
+          allMoves[x+1][2]=allMoves[x][2];
+          if (x==0) {
+            allMoves[0][0]=cur;
+            allMoves[0][1]=curR;
+            allMoves[0][2]=curC;
+          }
+        }
+        else if (cur > allMoves[x][0]) {
+          allMoves[x+1][0]=cur;
+          allMoves[x+1][1]=curR;
+          allMoves[x+1][2]=curC;
+          x=-1;
+        }
+      }
+    }
+    return allMoves;
+  }
+
+  private boolean outOfBounds(int row, int col) {
+    if (row < 0 || col < 0) return true;
+    if (row > board.length || col > board[0].length) return true;
     return false;
   }
 
@@ -137,7 +184,6 @@ public class KnightBoard {
 
   private int countH(int startingR, int startingC, int level) {
     int count = 0;
-    int[][] increments = {{1,1,-1,-1,2,2,-2,-2}, {2,-2,2,-2,1,-1,1,-1}};
     if (addKnight(startingR, startingC, level)) {
       if (level == board.length*board[0].length) {
         removeKnight(startingR, startingC);
@@ -170,6 +216,13 @@ public class KnightBoard {
     // KnightBoard test = new KnightBoard(4,4);
     // System.out.println(test);
      KnightBoard test2 = new KnightBoard(10,10);
+     int[][] test = test2.getMoves(2, 2);
+     System.out.println("\n");
+     for (int i = 0; i < test.length; i++) {
+       System.out.print(test[i][0] + " ");
+       System.out.print(test[i][1] + " ");
+       System.out.print(test[i][2] + "\n");
+     }
      // System.out.println(test2);
      // System.out.println(test2.countSolutions(0,0));
     // System.out.println(test2.solve(0,0));
