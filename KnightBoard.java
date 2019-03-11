@@ -230,3 +230,16 @@ public class KnightBoard {
 
   }
 }
+
+class Coordinate implements Comparable<Coordinate> {
+  public int row, col, moves;
+  public Coordinate(int r, int c, int m) {
+    row = r;
+    col = c;
+    moves = m;
+  }
+
+  public int compareTo(Coordinate other) {
+    return this.moves-other.moves;
+  }
+}
