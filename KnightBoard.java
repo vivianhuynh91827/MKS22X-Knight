@@ -114,52 +114,67 @@ public class KnightBoard {
     //if the starting col is out of range return false;
     if (board[startingR][startingC] != 0) return false;
     //if the current space is not empty return false;
-    for (int i = 0; i < 8; i++) {
-      int newR = startingR + increments[0][i];
-      int newC = startingC + increments[1][i];
-      board[startingR][startingC] = level;
-      if (solveH(newR, newC, level+1)) return true;
-      board[startingR][startingC] = 0;
+    if (board[startingR][startingC] == 0) {
+      Coordinate[] availMoves = getMoves(startingR, startingC);
+      lowerMoves(startingR, startingC);
+      for (int i = 0; i < availMoves.length; i++) {
+        board[startingR][startingC] = level;
+        if (solveH(startingR + availMoves[i].row, startingC + availMoves[i].col, level + 1)) {
+          return true;
+        }
+        board[startingR][startingC] = 0;
+      }
+      increaseMoves(startingR, startingC);
     }
     return false;
   }
 
-  private int[][] getMoves(int row, int col) {
-    int[][] allMoves = new int[moves[row][col]][3]; //1st col = outgoing moves, 2nd col =  row, 3rd col = col
-    for (int i = 0; i < moves[row][col]; i ++) {
-      allMoves[i][1] = row+increments[0][i];
-      allMoves[i][2] = col+increments[1][i];
-      allMoves[i][0] = moves[allMoves[i][1]][allMoves[i][2]];
-    }
-    for (int i = 0; i < allMoves.length; i++) {
-      System.out.print(allMoves[i][0] + " ");
-      System.out.print(allMoves[i][1] + " ");
-      System.out.print(allMoves[i][2] + "\n");
-    }
-    for (int i = 1; i < allMoves.length; i ++) {
-      int cur = allMoves[i][0];
-      int curR = allMoves[i][1];
-      int curC = allMoves[i][2];
-      for (int x = i-1; x >=0; x --) {
-        if (cur < allMoves[x][0]) {
-          allMoves[x+1][0]=allMoves[x][0];
-          allMoves[x+1][1]=allMoves[x][1];
-          allMoves[x+1][2]=allMoves[x][2];
-          if (x==0) {
-            allMoves[0][0]=cur;
-            allMoves[0][1]=curR;
-            allMoves[0][2]=curC;
-          }
-        }
-        else if (cur > allMoves[x][0]) {
-          allMoves[x+1][0]=cur;
-          allMoves[x+1][1]=curR;
-          allMoves[x+1][2]=curC;
-          x=-1;
-        }
+  private void lowerMoves(int row, int col) {
+    for (int i = 0; i < 8; i ++) {
+      if (!outOfBounds(row+increments[0][i], col+increments[1][i])) {
+        moves[row+increments[0][i]][col+increments[1][i]]--;
       }
     }
-    return allMoves;
+  }
+
+  private void increaseMoves(int row, int col) {
+    for (int i = 0; i < 8; i ++) {
+      if (!outOfBounds(row, col)) {
+        moves[row+increments[0][i]][col+increments[1][i]]++;
+      }
+    }
+  }
+
+  private Coordinate[] getMoves(int row, int col) {
+    Coordinate[] allMoves = new Coordinate[moves[row][col]];
+    int index = 0;
+    for (int i = 0; i < allMoves.length; i++) {
+      int newR = row + increments[0][i];
+      int newC = col + increments[1][i];
+      if (!outOfBounds(newR, newC)) {
+        Coordinate current = new Coordinate(newR, newC, moves[newR][newC]);
+        allMoves[index] = current;
+        index++;
+      }
+    }
+    for (int i = 1; i < allMoves.length; i ++) {
+      Coordinate cur = allMoves[i];
+      index = i;
+      for (int x = i; x < allMoves.length; x ++) {
+        if (cur.moves < allMoves[x].moves) {
+          cur=allMoves[x];
+          index = x;
+        }
+      }
+      allMoves[index] = allMoves[i];
+      allMoves[i] = cur;
+    }
+    Coordinate[] ans = new Coordinate[moves[row][col]];
+    for (int i = 0; i < ans.length; i ++) {
+      ans[i] = allMoves[ans.length-1-i];
+      // System.out.println(ans[i]);
+    }
+    return ans;
   }
 
   private boolean outOfBounds(int row, int col) {
@@ -216,13 +231,8 @@ public class KnightBoard {
     // KnightBoard test = new KnightBoard(4,4);
     // System.out.println(test);
      KnightBoard test2 = new KnightBoard(10,10);
-     int[][] test = test2.getMoves(2, 2);
-     System.out.println("\n");
-     for (int i = 0; i < test.length; i++) {
-       System.out.print(test[i][0] + " ");
-       System.out.print(test[i][1] + " ");
-       System.out.print(test[i][2] + "\n");
-     }
+     test2.solve(0,0);
+     System.out.println(test2);
      // System.out.println(test2);
      // System.out.println(test2.countSolutions(0,0));
     // System.out.println(test2.solve(0,0));
@@ -231,7 +241,7 @@ public class KnightBoard {
   }
 }
 
-class Coordinate implements Comparable<Coordinate> {
+class Coordinate {
   public int row, col, moves;
   public Coordinate(int r, int c, int m) {
     row = r;
@@ -239,7 +249,7 @@ class Coordinate implements Comparable<Coordinate> {
     moves = m;
   }
 
-  public int compareTo(Coordinate other) {
-    return this.moves-other.moves;
+  public String toString() {
+    return ""+moves + ", " + row + ", " + col;
   }
 }
